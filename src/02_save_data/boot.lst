@@ -1,0 +1,41 @@
+     1                                  	BOOT_LOAD	equ	0x7C00
+     2                                  
+     3                                  
+     4                                  entry:
+     5 00000000 EB58                    	jmp	ipl
+     6                                  
+     7                                  
+     8                                  	;; BPB(Bios Parameter Block)
+     9                                  
+    10 00000002 90<rept>                	times 90 - ($ - $$) db 0x90
+    11                                  
+    12                                  	;; IPL(Initial Program Loader)
+    13                                  
+    14                                  ipl:
+    15 0000005A FA                      	cli							;割り込み禁止
+    16                                  
+    17 0000005B B80000                  	mov	ax, 0x000				;AX = 0x0000
+    18 0000005E 8ED8                    	mov ds, ax					;DS = 0x0000
+    19 00000060 8EC0                    	mov es, ax					;ES = 0x0000
+    20 00000062 8ED0                    	mov ss, ax					;SS = 0x0000
+    21 00000064 BC007C                  	mov sp, BOOT_LOAD			;SP = 0x7C00
+    22                                  
+    23 00000067 FB                      	sti							;割り込み許可
+    24                                  
+    25 00000068 8816[7800]              	mov [BOOT.DRIVE], dl		;ブートドライブを保存
+    26                                  
+    27 0000006C B041                    	mov	al, 'A'
+    28 0000006E B40E                    	mov	ah, 0x0E				;テレタイプ式１文字出力
+    29 00000070 BB0000                  	mov	bx, 0x0000				;ページ番号と文字色を0に設定
+    30 00000073 CD10                    	int	0x10					;ビデオBIOSコール
+    31                                  
+    32 00000075 EBFE                    	jmp	$
+    33                                  
+    34 00000077 00                      ALIGN 2, db 0 
+    35                                  BOOT:							;ブートドライブに関する情報
+    36 00000078 0000                    .DRIVE:		dw	0				;ドライブ番号
+    37                                  	
+    38 0000007A 00<rept>                	times 510 - ($ - $$) db 0x00
+    39 000001FE 55AA                    	db 0x55, 0xAA
+    40                                  
+    41                                  	

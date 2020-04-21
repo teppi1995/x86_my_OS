@@ -1,0 +1,10 @@
+vga_set_read_plane:
+
+	;; 読み込みプレーンの選択
+	mov		ah, [ebp + 8]
+	and		ah, 0x03
+	mov		al, 0x04
+	mov		dx, 0x03CE
+	out		dx, ax
+
+	
